@@ -130,9 +130,10 @@
                 
                 <div class="navbar-nav">
                     <a class="nav-link position-relative" th:href="@{/carrito}">
-                        <i class="fas fa-shopping-cart"></i> Carrito
-                        <span th:if="${#lists.size(carrito) > 0}" class="carrito-badge" th:text="${#lists.size(carrito)}"></span>
-                    </a>
+    <i class="fas fa-shopping-cart"></i> Carrito
+    <span th:if="${cantidadCarrito > 0}" class="carrito-badge" th:text="${cantidadCarrito}"></span>
+</a>
+
                     <a class="nav-link" th:href="@{/logout}">
                         <i class="fas fa-sign-out-alt"></i> Cerrar Sesión
                     </a>

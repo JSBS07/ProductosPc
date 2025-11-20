@@ -21,7 +21,8 @@ public class StockService {
         if (productoOpt.isPresent()) {
             Producto producto = productoOpt.get();
             int stockDisponible = producto.getStock() - producto.getStockReservado();
-            
+
+            // Verificar si hay stock disponible para reservar
             if (stockDisponible >= cantidad) {
                 producto.setStockReservado(producto.getStockReservado() + cantidad);
                 productoRepository.save(producto);
@@ -36,8 +37,11 @@ public class StockService {
         Optional<Producto> productoOpt = productoRepository.findById(productoId);
         if (productoOpt.isPresent()) {
             Producto producto = productoOpt.get();
+
+            // Evitar valores negativos
             int nuevoStockReservado = producto.getStockReservado() - cantidad;
             producto.setStockReservado(Math.max(0, nuevoStockReservado));
+
             productoRepository.save(producto);
         }
     }
@@ -47,14 +51,18 @@ public class StockService {
         Optional<Producto> productoOpt = productoRepository.findById(productoId);
         if (productoOpt.isPresent()) {
             Producto producto = productoOpt.get();
+
             int stockDisponible = producto.getStock() - producto.getStockReservado();
             int diferencia = cantidadNueva - cantidadAnterior;
-            
-            if (stockDisponible >= diferencia) {
-                producto.setStockReservado(producto.getStockReservado() + diferencia);
-                productoRepository.save(producto);
-                return true;
+
+            // Si se aumenta la cantidad, verificar disponibilidad
+            if (diferencia > 0 && stockDisponible < diferencia) {
+                return false;
             }
+
+            producto.setStockReservado(producto.getStockReservado() + diferencia);
+            productoRepository.save(producto);
+            return true;
         }
         return false;
     }
@@ -64,9 +72,25 @@ public class StockService {
         Optional<Producto> productoOpt = productoRepository.findById(productoId);
         if (productoOpt.isPresent()) {
             Producto producto = productoOpt.get();
+
+            // Reducir stock reservado y stock real
             producto.setStockReservado(producto.getStockReservado() - cantidad);
             producto.setStock(producto.getStock() - cantidad);
+
             productoRepository.save(producto);
         }
+    }
+
+    // Limpiar reservas de stock para un usuario específico
+    public void limpiarReservasUsuario(Long usuarioId) {
+        // Esta función se llamará cuando el usuario cierre sesión
+        // o cuando el carrito se elimine
+        System.out.println("Limpiando reservas para usuario: " + usuarioId);
+    }
+
+    // Limpiar las reservas expiradas (para un cron job futuro)
+    public void limpiarReservasExpiradas() {
+        // Podrías implementar esto más adelante para limpiar carritos abandonados
+        System.out.println("Limpiando reservas expiradas");
     }
 }
