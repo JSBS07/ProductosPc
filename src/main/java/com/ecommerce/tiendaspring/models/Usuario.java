@@ -2,7 +2,6 @@ package com.ecommerce.tiendaspring.models;
 
 import jakarta.persistence.*;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 
 @Entity
@@ -28,6 +27,10 @@ public class Usuario {
         inverseJoinColumns = @JoinColumn(name = "rol_id", referencedColumnName = "id")
     )
     private List<Rol> roles = new ArrayList<>();
+
+    // Campo para persistir carrito en JSON
+    @Column(columnDefinition = "TEXT")
+    private String carritoJson;
 
     // Constructores
     public Usuario() {}
@@ -78,5 +81,13 @@ public class Usuario {
 
     public void setRoles(List<Rol> roles) {
         this.roles = roles;
+    }
+
+    public String getCarritoJson() {
+        return carritoJson;
+    }
+
+    public void setCarritoJson(String carritoJson) {
+        this.carritoJson = carritoJson;
     }
 }

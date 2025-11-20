@@ -16,6 +16,9 @@ public class ProductoService {
     @Autowired
     private ProductoRepository productoRepository;
 
+    @Autowired
+    private com.ecommerce.tiendaspring.repositories.CarritoItemRepository carritoItemRepository;
+
     public List<Producto> obtenerTodosLosProductos() {
         return productoRepository.findAll(
                 Sort.by(Sort.Direction.ASC, "orden")
@@ -48,7 +51,9 @@ public class ProductoService {
         Optional<Producto> productoOpt = productoRepository.findById(productoId);
         if (productoOpt.isPresent()) {
             Producto producto = productoOpt.get();
-            producto.setStock(producto.getStock() - cantidadVendida);
+            int nuevoStock = producto.getStock() - cantidadVendida;
+            if (nuevoStock < 0) nuevoStock = 0;
+            producto.setStock(nuevoStock);
             productoRepository.save(producto);
         }
     }
@@ -57,6 +62,11 @@ public class ProductoService {
         return productoRepository.findAll(
                 Sort.by(Sort.Direction.ASC, "orden")
         ).stream()
+                // Calcular reservas desde CarritoItem y filtrar por stock disponible
+                .peek(p -> {
+                    Integer reservado = carritoItemRepository.sumCantidadByProductoId(p.getId());
+                    p.setStockReservado(reservado == null ? 0 : reservado);
+                })
                 .filter(p -> p.getStockDisponible() > 0)
                 .collect(Collectors.toList());
     }
@@ -67,6 +77,10 @@ public class ProductoService {
                 categoria,
                 Sort.by(Sort.Direction.ASC, "orden")
         ).stream()
+                .peek(p -> {
+                    Integer reservado = carritoItemRepository.sumCantidadByProductoId(p.getId());
+                    p.setStockReservado(reservado == null ? 0 : reservado);
+                })
                 .filter(p -> p.getStockDisponible() > 0)
                 .collect(Collectors.toList());
     }

@@ -197,13 +197,13 @@
                         <p class="card-text text-muted" th:text="${producto.descripcion}"></p>
                         <div class="d-flex justify-content-between align-items-center mb-3">
                             <span class="h4 text-warning" th:text="'$' + ${#numbers.formatDecimal(producto.precio, 1, 2, 'COMMA')}"></span>
-                            <span class="badge badge-stock" th:text="${producto.stockDisponible} + ' disponibles'"></span>
+                            <span id="stock-" th:attr="id=${'stock-' + producto.id}" class="badge badge-stock" th:text="${producto.stockDisponible} + ' disponibles'"></span>
                         </div>
                         <form th:action="@{/agregar-carrito}" method="post">
                             <input type="hidden" name="productoId" th:value="${producto.id}">
                             <div class="input-group mb-2">
-                                <input type="number" class="form-control" name="cantidad" value="1" min="1" 
-       th:attr="max=${producto.stockDisponible}" 
+                                <input type="number" class="form-control" name="cantidad" value="1" min="1"
+    th:attr="max=${producto.stockDisponible}, data-product-id=${producto.id}, id=${'input-' + producto.id}"
        style="background: #2c2c2c; color: white; border: 1px solid var(--gold-border);">
 
                             </div>
@@ -225,5 +225,33 @@
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sockjs-client@1/dist/sockjs.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/stompjs@2.3.3/lib/stomp.min.js"></script>
+    <script>
+        (function() {
+            try {
+                var socket = new SockJS('/ws');
+                var stompClient = Stomp.over(socket);
+                stompClient.connect({}, function(frame) {
+                    console.log('Connected: ' + frame);
+                    stompClient.subscribe('/topic/stock', function(message) {
+                        var payload = JSON.parse(message.body);
+                        var productId = payload.productoId;
+                        var stock = payload.stock;
+                        var stockReservado = payload.stockReservado;
+                        var disponibles = stock - stockReservado;
+                        // actualizar badge
+                        var badge = document.getElementById('stock-' + productId);
+                        if (badge) badge.textContent = disponibles + ' disponibles';
+                        // actualizar input max
+                        var input = document.getElementById('input-' + productId);
+                        if (input) input.max = disponibles;
+                    });
+                });
+            } catch (e) {
+                console.log('WebSocket not available', e);
+            }
+        })();
+    </script>
 </body>
 </html>

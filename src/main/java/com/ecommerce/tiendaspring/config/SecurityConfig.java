@@ -40,26 +40,26 @@ public class SecurityConfig {
     }
 
     @Bean
-public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-    http
-        .authorizeHttpRequests(auth -> auth
-            .requestMatchers("/", "/home", "/about", "/contact", "/login", "/register", "/css/**", "/js/**", "/images/**").permitAll()
-            .requestMatchers("/admin/**").hasRole("ADMIN")
-            .anyRequest().authenticated()
-        )
-        .formLogin(form -> form
-            .loginPage("/login")
-            .defaultSuccessUrl("/tienda", true)
-            .permitAll()
-        )
-        .logout(logout -> logout
-    .logoutRequestMatcher(new AntPathRequestMatcher("/logout"))
-    .logoutSuccessUrl("/?logout")  
-    .deleteCookies("JSESSIONID")
-    .permitAll()
-)
-        .authenticationProvider(authenticationProvider());
+    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+        http
+            .authorizeHttpRequests(auth -> auth
+                .requestMatchers("/", "/home", "/about", "/contact", "/login", "/register", "/css/**", "/js/**", "/images/**").permitAll()
+                .requestMatchers("/admin/**").hasRole("ADMIN")
+                .anyRequest().authenticated()
+            )
+            .formLogin(form -> form
+                .loginPage("/login")
+                .defaultSuccessUrl("/login-success", true) // <-- endpoint especial para cargar carrito
+                .permitAll()
+            )
+            .logout(logout -> logout
+                .logoutRequestMatcher(new AntPathRequestMatcher("/logout"))
+                .logoutSuccessUrl("/?logout")
+                .deleteCookies("JSESSIONID")
+                .permitAll()
+            )
+            .authenticationProvider(authenticationProvider());
 
-    return http.build();
+        return http.build();
     }
 }

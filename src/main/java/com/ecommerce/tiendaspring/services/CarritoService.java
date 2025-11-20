@@ -7,7 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -25,9 +25,12 @@ public class CarritoService {
     private ProductoService productoService;
 
     @Autowired
+    private UsuarioService usuarioService;
+
+    @Autowired
     private StockService stockService;
 
-    // Obtener o crear carrito para un usuario
+    // ================= Obtener o crear carrito para un usuario =================
     public Carrito obtenerCarritoUsuario(Usuario usuario) {
         return carritoRepository.findByUsuario(usuario)
                 .orElseGet(() -> {
@@ -36,130 +39,78 @@ public class CarritoService {
                 });
     }
 
-    // Agregar producto al carrito
-    public boolean agregarProductoAlCarrito(Usuario usuario, Long productoId, Integer cantidad) {
-        Carrito carrito = obtenerCarritoUsuario(usuario);
-        Producto producto = productoService.obtenerProductoPorId(productoId)
-                .orElseThrow(() -> new RuntimeException("Producto no encontrado"));
-
-        // Verificar stock disponible
-        if (producto.getStockDisponible() < cantidad) {
-            return false;
-        }
-
-        // Reservar stock
-        if (!stockService.reservarStock(productoId, cantidad)) {
-            return false;
-        }
-
-        // Buscar si el producto ya está en el carrito
-        Optional<CarritoItem> itemExistente = carrito.getItems().stream()
-                .filter(item -> item.getProducto().getId().equals(productoId))
-                .findFirst();
-
-        if (itemExistente.isPresent()) {
-            // Actualizar cantidad existente
-            CarritoItem item = itemExistente.get();
-            stockService.liberarStock(productoId, item.getCantidad());
-            if (!stockService.reservarStock(productoId, cantidad)) {
-                return false;
-            }
-            item.setCantidad(cantidad);
-        } else {
-            // Agregar nuevo item
-            CarritoItem nuevoItem = new CarritoItem(carrito, producto, cantidad);
-            carrito.agregarItem(nuevoItem);
-        }
-
-        carrito.setFechaActualizacion(java.time.LocalDateTime.now());
-        carritoRepository.save(carrito);
-        return true;
-    }
-
-    // Actualizar cantidad en carrito
-    public boolean actualizarCantidad(Usuario usuario, Long productoId, Integer nuevaCantidad) {
-        Carrito carrito = obtenerCarritoUsuario(usuario);
-        
-        CarritoItem item = carrito.getItems().stream()
-                .filter(i -> i.getProducto().getId().equals(productoId))
-                .findFirst()
-                .orElseThrow(() -> new RuntimeException("Producto no encontrado en carrito"));
-
-        int cantidadAnterior = item.getCantidad();
-        
-        if (nuevaCantidad <= 0) {
-            return eliminarProductoDelCarrito(usuario, productoId);
-        }
-
-        // Verificar nuevo stock disponible
-        Producto producto = item.getProducto();
-        int stockNecesario = nuevaCantidad - cantidadAnterior;
-        if (producto.getStockDisponible() < stockNecesario) {
-            return false;
-        }
-
-        // Actualizar reserva de stock
-        stockService.liberarStock(productoId, cantidadAnterior);
-        if (!stockService.reservarStock(productoId, nuevaCantidad)) {
-            // Revertir a la cantidad anterior si falla
-            stockService.reservarStock(productoId, cantidadAnterior);
-            return false;
-        }
-
-        item.setCantidad(nuevaCantidad);
-        carrito.setFechaActualizacion(java.time.LocalDateTime.now());
-        carritoRepository.save(carrito);
-        return true;
-    }
-
-    // Eliminar producto del carrito
-    public boolean eliminarProductoDelCarrito(Usuario usuario, Long productoId) {
-        Carrito carrito = obtenerCarritoUsuario(usuario);
-        
-        Optional<CarritoItem> itemOpt = carrito.getItems().stream()
-                .filter(i -> i.getProducto().getId().equals(productoId))
-                .findFirst();
-
-        if (itemOpt.isPresent()) {
-            CarritoItem item = itemOpt.get();
-            // Liberar stock reservado
-            stockService.liberarStock(productoId, item.getCantidad());
-            carrito.removerItem(item);
-            carritoItemRepository.delete(item);
-            carrito.setFechaActualizacion(java.time.LocalDateTime.now());
-            carritoRepository.save(carrito);
-            return true;
-        }
-        return false;
-    }
-
-    // Vaciar carrito
-    public void vaciarCarrito(Usuario usuario) {
-        Carrito carrito = obtenerCarritoUsuario(usuario);
-        
-        // Liberar stock de todos los items
+    // ================= Convertir Carrito persistente a DTO =================
+    public List<CarritoItemDTO> convertirACarritoDTO(Carrito carrito) {
+        List<CarritoItemDTO> carritoDTO = new ArrayList<>();
         for (CarritoItem item : carrito.getItems()) {
-            stockService.liberarStock(item.getProducto().getId(), item.getCantidad());
+            carritoDTO.add(new CarritoItemDTO(item.getProducto(), item.getCantidad()));
         }
-        
+        return carritoDTO;
+    }
+
+    // ================= Actualizar Carrito desde DTO =================
+    public void actualizarCarritoDesdeDTO(Usuario usuario, List<CarritoItemDTO> carritoDTO) {
+        Carrito carrito = obtenerCarritoUsuario(usuario);
+
+        // Limpiar items existentes
         carrito.getItems().clear();
-        carrito.setFechaActualizacion(java.time.LocalDateTime.now());
+        carritoItemRepository.deleteByCarritoId(carrito.getId());
+
+        // Agregar nuevos items desde DTO
+        for (CarritoItemDTO itemDTO : carritoDTO) {
+            CarritoItem item = new CarritoItem(carrito, itemDTO.getProducto(), itemDTO.getCantidad());
+            carrito.agregarItem(item);
+        }
+
         carritoRepository.save(carrito);
     }
 
-    // Obtener total del carrito
-    public BigDecimal obtenerTotalCarrito(Usuario usuario) {
-        Carrito carrito = obtenerCarritoUsuario(usuario);
-        return carrito.getItems().stream()
-                .map(CarritoItem::getSubtotal)
-                .reduce(BigDecimal.ZERO, BigDecimal::add);
+    // ================= Cargar carrito desde BD =================
+    public List<CarritoItemDTO> cargarCarritoUsuario(String email) {
+        System.out.println("Cargando carrito para usuario: " + email);
+
+        Optional<Usuario> usuarioOpt = usuarioService.obtenerUsuarioPorEmail(email);
+        if (usuarioOpt.isPresent()) {
+            Carrito carrito = obtenerCarritoUsuario(usuarioOpt.get());
+            List<CarritoItemDTO> carritoDTO = convertirACarritoDTO(carrito);
+            System.out.println("Carrito cargado: " + carritoDTO.size() + " items");
+            return carritoDTO;
+        }
+
+        System.out.println("Usuario no encontrado: " + email);
+        return new ArrayList<>();
     }
 
-    // Obtener número de items en carrito
-    public int obtenerCantidadItemsCarrito(Usuario usuario) {
-        Carrito carrito = obtenerCarritoUsuario(usuario);
-        return carrito.getItems().stream()
-                .mapToInt(CarritoItem::getCantidad)
-                .sum();
+    // ================= Guardar carrito DTO en BD =================
+    public void guardarCarritoUsuario(String email, List<CarritoItemDTO> carritoDTO) {
+        System.out.println("Guardando carrito para usuario: " + email + " - Items: " + carritoDTO.size());
+
+        Optional<Usuario> usuarioOpt = usuarioService.obtenerUsuarioPorEmail(email);
+        if (usuarioOpt.isPresent()) {
+            actualizarCarritoDesdeDTO(usuarioOpt.get(), carritoDTO);
+            System.out.println("Carrito guardado exitosamente");
+            // Después de guardar en BD, emitir actualizaciones de stock para cada producto
+            for (CarritoItemDTO item : carritoDTO) {
+                try {
+                    stockService.broadcastStockUpdate(item.getProducto().getId());
+                } catch (Exception e) {
+                    System.out.println("Error broadcasting stock update: " + e.getMessage());
+                }
+            }
+        } else {
+            System.out.println("No se pudo guardar carrito - usuario no encontrado");
+        }
+    }
+
+    // ================= Sincronizar stock entre sesión y BD =================
+    public void sincronizarStockCarrito(List<CarritoItemDTO> carritoDTO) {
+        for (CarritoItemDTO item : carritoDTO) {
+            int stockDisponible = item.getProducto().getStockDisponible();
+            if (item.getCantidad() > stockDisponible) {
+                System.out.println("Ajustando cantidad de " + item.getProducto().getNombre() +
+                        " de " + item.getCantidad() + " a " + stockDisponible);
+                item.setCantidad(stockDisponible);
+            }
+        }
     }
 }
