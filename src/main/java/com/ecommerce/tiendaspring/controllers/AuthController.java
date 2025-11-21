@@ -21,6 +21,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import org.springframework.web.servlet.support.RequestContextUtils;
 
 @Controller
 public class AuthController {
@@ -46,6 +47,10 @@ public class AuthController {
     public String loginSuccessHandler(HttpServletRequest request, Model model) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String email = authentication.getName();
+        
+         boolean esAdmin = authentication.getAuthorities()
+            .stream()
+            .anyMatch(rol -> rol.getAuthority().equals("ROLE_ADMIN"));
 
         // Limpiar carrito de sesión anterior
         request.getSession().setAttribute("carrito", new ArrayList<CarritoItemDTO>());
@@ -63,6 +68,22 @@ public class AuthController {
             request.getSession().setAttribute("carrito", new ArrayList<CarritoItemDTO>());
         }
 
+        if (esAdmin) {
+            return "redirect:/admin";
+        }
+
+        // Mostrar mensaje si el admin restableció la contraseña recientemente
+        try {
+            usuarioService.obtenerUsuarioPorEmail(email).ifPresent(u -> {
+                if (Boolean.TRUE.equals(u.getPasswordRestablecida())) {
+                    // añadir flash attribute para la siguiente petición
+                    RequestContextUtils.getOutputFlashMap(request).put("success", "Has ingresado con contraseña restablecida. Cámbiala ya.");
+                    // limpiar la bandera
+                    u.setPasswordRestablecida(false);
+                    usuarioService.guardarUsuario(u);
+                }
+            });
+        } catch (Exception ignore) {}
         return "redirect:/tienda";
     }
 

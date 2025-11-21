@@ -5,136 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>TechStore - Tu Tienda de Tecnología</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" th:href="@{/css/cyberpunk.css}" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <style>
-        :root {
-            --gold-primary: #d4af37;
-            --gold-gradient: linear-gradient(135deg, #d4af37 0%, #f7ef8a 100%);
-            --gold-border: #b8941f;
-            --black-dark: #0a0a0a;
-            --black-light: #1a1a1a;
-        }
-        
-        .hero-section {
-            background: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 100%);
-            color: white;
-            padding: 120px 0 80px 0;
-            text-align: center;
-            min-height: 100vh;
-            display: flex;
-            align-items: center;
-        }
-        
-        .btn-gold {
-            background: var(--gold-gradient);
-            border: none;
-            color: var(--black-dark);
-            font-weight: 600;
-            padding: 12px 30px;
-            border-radius: 8px;
-            transition: all 0.3s ease;
-            text-decoration: none;
-            display: inline-block;
-        }
-        
-        .btn-gold:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 25px rgba(212, 175, 55, 0.4);
-            color: var(--black-dark);
-        }
-        
-        .feature-card {
-            background: rgba(26, 26, 26, 0.95);
-            border: 1px solid var(--gold-border);
-            border-radius: 12px;
-            padding: 2rem;
-            text-align: center;
-            transition: transform 0.3s ease;
-            height: 100%;
-        }
-        
-        .feature-card:hover {
-            transform: translateY(-5px);
-        }
-        
-        .feature-icon {
-            font-size: 3rem;
-            color: var(--gold-primary);
-            margin-bottom: 1rem;
-        }
-        
-        .category-section {
-            padding: 80px 0;
-            background: linear-gradient(135deg, #1a1a1a 0%, #0a0a0a 100%);
-        }
-        
-        .category-card {
-            background: rgba(26, 26, 26, 0.8);
-            border: 1px solid var(--gold-border);
-            border-radius: 12px;
-            padding: 2rem;
-            text-align: center;
-            transition: all 0.3s ease;
-            text-decoration: none;
-            color: white;
-            display: block;
-        }
-        
-        .category-card:hover {
-            transform: translateY(-5px);
-            text-decoration: none;
-            color: white;
-            box-shadow: 0 8px 25px rgba(212, 175, 55, 0.3);
-        }
-        
-        .stats-section {
-            background: var(--gold-gradient);
-            color: var(--black-dark);
-            padding: 60px 0;
-        }
-        
-        .stat-number {
-            font-size: 3rem;
-            font-weight: bold;
-            margin-bottom: 0.5rem;
-        }
-        
-        .navbar-brand {
-            color: var(--gold-primary) !important;
-            font-weight: bold;
-        }
-        
-        .nav-link {
-            color: #fff !important;
-            transition: color 0.3s ease;
-        }
-        
-        .nav-link:hover {
-            color: var(--gold-primary) !important;
-        }
-        
-        .btn-outline-gold {
-            border: 2px solid var(--gold-primary);
-            color: var(--gold-primary);
-            background: transparent;
-            transition: all 0.3s ease;
-        }
-        
-        .btn-outline-gold:hover {
-            background: var(--gold-gradient);
-            color: var(--black-dark);
-            border-color: transparent;
-        }
-        
-        .back-button {
-            position: absolute;
-            top: 20px;
-            left: 20px;
-            z-index: 1000;
-        }
-    </style>
 </head>
-<body style="background: #0a0a0a; color: #fff;">
+<body>
     <!-- Navigation -->
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
         <div class="container">
@@ -161,7 +35,7 @@
                     <a class="nav-link me-3" th:href="@{/login}">
                         <i class="fas fa-sign-in-alt me-1"></i>Iniciar Sesión
                     </a>
-                    <a class="btn btn-outline-gold" th:href="@{/register}">
+                    <a class="btn btn-outline-primary" th:href="@{/register}">
                         <i class="fas fa-user-plus me-1"></i>Registrarse
                     </a>
                 </div>
@@ -175,10 +49,7 @@
             <div class="row justify-content-center text-center">
                 <div class="col-lg-8">
                     <h1 class="display-4 fw-bold mb-4">
-                        Tecnología de 
-                        <span style="background: var(--gold-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">
-                            Alto Rendimiento
-                        </span>
+                        Tecnología de <span class="logo-glow">Alto Rendimiento</span>
                     </h1>
                     <p class="lead mb-5">
                         Descubre los mejores productos tecnológicos al mejor precio. 

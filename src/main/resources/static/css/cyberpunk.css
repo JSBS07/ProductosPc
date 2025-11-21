@@ -1,0 +1,212 @@
+/* Cyberpunk / Futuristic theme for the whole app
+   Palette: purples #8b5cf6, electric blue #06b6d4, neon pink #ec4899, neon green #06d6a0
+   Backgrounds: dark gradients
+   Effects: glassmorphism, neon glows, soft neumorphism, animated gradients
+*/
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&family=Poppins:wght@300;400;600;700&family=Exo+2:wght@300;400;600;700&display=swap');
+
+:root{
+  --bg-1: #0f172a; /* slate-900 */
+  --bg-2: #1e293b; /* slate-800 */
+  --purple: #8b5cf6;
+  --electric: #06b6d4;
+  --neon-pink: #ec4899;
+  --neon-green: #06d6a0;
+  --glass: rgba(255,255,255,0.04);
+  --glass-strong: rgba(255,255,255,0.06);
+  --text: #ffffff;
+  --muted: #94a3b8;
+  --radius: 16px;
+  --soft-shadow: 0 6px 18px rgba(11,12,18,0.6);
+}
+
+*{box-sizing:border-box}
+html,body{height:100%;}
+body{
+  margin:0;
+  font-family: 'Inter', 'Poppins', 'Exo 2', system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial;
+  color:var(--text);
+  background: linear-gradient(135deg,var(--bg-1) 0%, var(--bg-2) 100%);
+  -webkit-font-smoothing:antialiased;
+  -moz-osx-font-smoothing:grayscale;
+}
+
+/* Global container tweaks */
+.container{max-width:1200px}
+
+/* NAVBAR */
+.navbar, .navbar-dark.bg-dark{
+  background: linear-gradient(90deg, rgba(139,92,246,0.06), rgba(6,182,212,0.04));
+  border-bottom: 1px solid rgba(255,255,255,0.03);
+  backdrop-filter: blur(8px) saturate(130%);
+  box-shadow: 0 8px 30px rgba(0,0,0,0.6);
+}
+.producto-imagen{
+  height:200px;
+  overflow:hidden;
+  background: linear-gradient(135deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  border-radius:12px;
+}
+.producto-imagen img{width:100%; height:100%; object-fit:cover; transition:transform .3s ease}
+.producto-imagen:hover img{transform:scale(1.05)}
+
+/* Quantity input used in tienda and carrito templates */
+.quantity-input{width:70px; background: rgba(3,6,8,0.45); color:var(--text); border:1px solid rgba(255,255,255,0.03); border-radius:8px; padding:6px}
+
+/* Feature icons and titles (restore size/layout similar to previous) */
+.feature-icon{font-size:3rem; color:var(--electric); margin-bottom:1rem}
+.card-title{color:var(--text); font-weight:700}
+
+/* Small helpers to preserve previous spacing for hero/lead */
+.hero-section{padding:120px 0 80px 0; min-height:60vh}
+.lead{color:var(--muted)}
+.navbar-brand{font-weight:700; color:var(--purple) !important; letter-spacing:0.6px}
+.navbar .nav-link{color:var(--muted) !important; transition:all .18s ease}
+.navbar .nav-link:hover{color:var(--electric) !important; text-shadow:0 0 8px rgba(6,182,212,0.18)}
+
+/* Cards - glassmorphism */
+.card, .card-body, .card.bg-secondary, .card.shadow-lg{
+  background: linear-gradient(135deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+  border: 1px solid rgba(255,255,255,0.04);
+  border-radius: var(--radius);
+  box-shadow: 0 6px 28px rgba(7,8,10,0.6), 0 0 26px rgba(139,92,246,0.04) inset;
+  backdrop-filter: blur(10px) saturate(140%);
+}
+
+/* Neon glowing headings */
+h1,h2,h3,h4,h5{color:var(--text); text-shadow:0 2px 12px rgba(139,92,246,0.08)}
+
+/* Utility primary background used in templates for icons/badges */
+.bg-primary{background: linear-gradient(90deg, var(--purple), var(--electric)); color:#031018 !important}
+
+.text-muted{color:var(--muted) !important}
+
+/* Improve contrast for muted and body text to ensure readability */
+.text-muted{ color: rgba(255,255,255,0.68) !important }
+p, .card-text, td, th, small { color: rgba(255,255,255,0.92) }
+label, .form-label { color: rgba(255,255,255,0.95) }
+.lead { color: rgba(255,255,255,0.85) }
+
+/* Navbar and links readability */
+.navbar .nav-link { color: rgba(255,255,255,0.82) !important }
+.navbar .nav-link:hover, .navbar .nav-link:focus { color: var(--electric) !important; text-shadow: 0 0 8px rgba(6,182,212,0.12) }
+
+/* Table text */
+.table th, .table td { color: rgba(255,255,255,0.92); border-color: rgba(255,255,255,0.03) }
+
+/* Form placeholders and helper text */
+.form-control::placeholder { color: rgba(255,255,255,0.5) }
+.form-text { color: rgba(255,255,255,0.66) }
+
+/* Ensure alert text is readable */
+.alert { color: var(--text) }
+
+/* Small override for elements that previously used inline white text */
+.text-white, .mb-0[style*="color: #fff"] { color: rgba(255,255,255,0.98) !important }
+
+/* Buttons - luminous gradients */
+.btn-primary{
+  background: linear-gradient(90deg, var(--purple), var(--electric));
+  border: none;
+  color: #031018;
+  font-weight:700;
+  box-shadow: 0 6px 18px rgba(6,182,212,0.08), 0 0 18px rgba(139,92,246,0.14);
+  border-radius: 12px;
+  transition: transform .15s ease, box-shadow .15s ease;
+}
+.btn-primary:hover{transform:translateY(-3px); box-shadow: 0 10px 30px rgba(139,92,246,0.14), 0 0 30px rgba(6,182,212,0.18)}
+.btn-outline-primary{border:1px solid rgba(139,92,246,0.18); color:var(--purple)}
+.btn-danger{background:linear-gradient(90deg,var(--neon-pink),#ff7ab6); color:#061017}
+.btn-success{background: linear-gradient(90deg,var(--neon-green), #36e6b4); color:#061017}
+
+/* Inputs */
+.form-control{
+  background: rgba(3,6,8,0.4);
+  border: 1px solid rgba(255,255,255,0.04);
+  color:var(--text);
+  border-radius: 12px;
+  padding: 10px 12px;
+  transition: box-shadow .12s ease, border-color .12s ease;
+}
+.form-control:focus{outline:none; box-shadow: 0 6px 20px rgba(6,182,212,0.06), 0 0 18px rgba(139,92,246,0.06); border-color: rgba(6,182,212,0.6)}
+.input-group-text{background:transparent; border:none; color:var(--muted)}
+
+/* Tables */
+.table{border-collapse:separate; border-spacing:0; background:transparent}
+.table th, .table td{border-top: 1px solid rgba(255,255,255,0.02)}
+.table thead th{color:var(--muted); font-weight:600}
+
+/* Badges and stock */
+.badge-stock{
+  background: linear-gradient(90deg, rgba(139,92,246,0.12), rgba(6,182,212,0.08));
+  color:var(--text);
+  border-radius:10px;
+  padding:6px 10px;
+  box-shadow:0 6px 18px rgba(6,182,212,0.04);
+}
+
+/* Cards for balance, special components */
+.cyber-card{
+  border-radius:20px;
+  padding:18px;
+  background: linear-gradient(135deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+  border:1px solid rgba(139,92,246,0.06);
+  box-shadow: 0 12px 36px rgba(6,182,212,0.04), 0 0 36px rgba(236,72,153,0.02) inset;
+}
+.balance-amount{font-weight:800; font-size:1.6rem; color:var(--neon-green); text-shadow: 0 0 14px rgba(6,214,160,0.12)}
+
+/* Progress bars neon */
+.progress {background: rgba(255,255,255,0.03); height:8px; border-radius:999px}
+.progress .progress-bar{background: linear-gradient(90deg,var(--neon-pink), var(--neon-green)); box-shadow:0 6px 20px rgba(236,72,153,0.12)}
+
+/* Buttons small etc */
+.btn-sm{border-radius:10px}
+
+/* Links and small text */
+a { color: var(--electric); }
+a:hover{ text-decoration:none; color:var(--neon-pink); text-shadow:0 0 8px rgba(236,72,153,0.12)}
+
+/* Alerts */
+.alert{border-radius:12px; border:1px solid rgba(255,255,255,0.03); background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));}
+.alert-success{border-left:4px solid var(--neon-green); color:var(--text)}
+.alert-danger{border-left:4px solid var(--neon-pink)}
+
+/* Footer small adjustments */
+footer{color:var(--muted)}
+
+/* Animations for subtle glow */
+@keyframes neon-flicker {
+  0%{filter:drop-shadow(0 0 6px rgba(139,92,246,0.12))}
+  50%{filter:drop-shadow(0 0 12px rgba(6,182,212,0.14))}
+  100%{filter:drop-shadow(0 0 6px rgba(139,92,246,0.12))}
+}
+.logo-glow{animation:neon-flicker 4s ease-in-out infinite}
+
+/* Make icons thin-looking */
+.fas, .fa, i{filter:drop-shadow(0 0 6px rgba(139,92,246,0.04));}
+
+/* Responsive tweaks */
+@media (max-width:768px){
+  .container{padding-left:16px; padding-right:16px}
+  .navbar-brand{font-size:1rem}
+}
+
+/* Utility to add colored border glow for focused cards */
+.card.focused{box-shadow: 0 12px 50px rgba(6,182,212,0.12), 0 0 40px rgba(139,92,246,0.06)}
+
+/* Ensure modal/dialogs inherit theme */
+.modal-content{background: linear-gradient(135deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01)); border-radius:16px; border:1px solid rgba(255,255,255,0.03)}
+
+/* Inputs with neon outline on error/success */
+.is-valid{box-shadow:0 6px 18px rgba(6,182,212,0.06)}
+.is-invalid{box-shadow:0 6px 18px rgba(236,72,153,0.06)}
+
+/* small helpers to make elements more cyberpunk */
+.glow-border{border-radius:12px; box-shadow: 0 0 20px rgba(139,92,246,0.06)}
+
+/* Override bootstrap primary outline focus */
+.btn:focus{outline:none; box-shadow:0 6px 26px rgba(139,92,246,0.08)}

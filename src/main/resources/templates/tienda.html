@@ -6,108 +6,10 @@
     <title>TechStore - Tu Tienda de Tecnología</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <style>
-    :root {
-        --gold-primary: #d4af37;
-        --gold-gradient: linear-gradient(135deg, #d4af37 0%, #f7ef8a 100%);
-        --gold-border: #b8941f;
-        --black-dark: #0a0a0a;
-        --black-light: #1a1a1a;
-    }
-
-    .navbar-brand {
-        color: var(--gold-primary) !important;
-        font-weight: bold;
-    }
-
-    .card {
-        border: 1px solid var(--gold-border);
-        transition: transform 0.3s ease, box-shadow 0.3s ease;
-        background: rgba(26, 26, 26, 0.95);
-    }
-
-    .card:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 8px 25px rgba(212, 175, 55, 0.3);
-    }
-
-    .producto-imagen {
-        height: 200px;
-        overflow: hidden;
-        background: linear-gradient(135deg, #2c2c2c 0%, #1a1a1a 100%);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        position: relative;
-    }
-
-    .producto-imagen img {
-        width: 100%;
-        height: 100%;
-        object-fit: cover;
-        transition: transform 0.3s ease;
-    }
-
-    .producto-imagen:hover img {
-        transform: scale(1.05);
-    }
-
-    /* Fallback si la imagen no carga */
-    .producto-imagen::before {
-        content: "🖼️";
-        font-size: 3rem;
-        color: var(--gold-primary);
-        display: none;
-        position: absolute;
-    }
-
-    .producto-imagen:has(img[src=""])::before,
-    .producto-imagen:not(:has(img))::before {
-        display: block;
-    }
-
-    .btn-primary {
-        background: var(--gold-gradient);
-        border: none;
-        color: var(--black-dark);
-        font-weight: 600;
-    }
-
-    .btn-primary:hover {
-        background: var(--gold-gradient);
-        transform: translateY(-2px);
-        box-shadow: 0 4px 12px rgba(212, 175, 55, 0.3);
-    }
-
-    .nav-pills .nav-link.active {
-        background: var(--gold-gradient) !important;
-        color: var(--black-dark) !important;
-        font-weight: 600;
-    }
-
-    .nav-pills .nav-link {
-        color: var(--gold-primary);
-        border: 1px solid var(--gold-border);
-        margin: 0 5px;
-    }
-
-    .badge-stock {
-        background: var(--gold-gradient);
-        color: var(--black-dark);
-    }
-
-    .carrito-badge {
-        background: #dc3545;
-        color: white;
-        border-radius: 50%;
-        padding: 2px 6px;
-        font-size: 0.7rem;
-        margin-left: 5px;
-    }
-</style>
+    <link rel="stylesheet" th:href="@{/css/cyberpunk.css}" />
 
 </head>
-<body style="background: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 100%); min-height: 100vh; color: #fff;">
+<body>
     <!-- Navbar -->
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark sticky-top">
     <div class="container">
@@ -236,9 +138,8 @@
                         <form th:action="@{/agregar-carrito}" method="post">
                             <input type="hidden" name="productoId" th:value="${producto.id}">
                             <div class="input-group mb-2">
-                                <input type="number" class="form-control" name="cantidad" value="1" min="1"
-    th:attr="max=${producto.stockDisponible}, data-product-id=${producto.id}, id=${'input-' + producto.id}"
-       style="background: #2c2c2c; color: white; border: 1px solid var(--gold-border);">
+                                     <input type="number" class="form-control" name="cantidad" value="1" min="1"
+     th:attr="max=${producto.stockDisponible}, data-product-id=${producto.id}, id=${'input-' + producto.id}" />
 
                             </div>
                             <button type="submit" class="btn btn-primary w-100">

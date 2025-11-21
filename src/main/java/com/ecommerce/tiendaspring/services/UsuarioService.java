@@ -31,6 +31,18 @@ public class UsuarioService {
         usuarioRepository.deleteById(id);
     }
 
+    public void resetPasswordByAdmin(Long id, String newPassword, org.springframework.security.crypto.password.PasswordEncoder passwordEncoder) {
+        Optional<Usuario> usuarioOpt = usuarioRepository.findById(id);
+        if (usuarioOpt.isPresent()) {
+            Usuario usuario = usuarioOpt.get();
+            usuario.setPassword(passwordEncoder.encode(newPassword));
+            usuario.setPasswordRestablecida(true);
+            usuarioRepository.save(usuario);
+        } else {
+            throw new RuntimeException("Usuario no encontrado");
+        }
+    }
+
     public Optional<Usuario> obtenerUsuarioPorEmail(String email) {
         return usuarioRepository.findByEmail(email);
     }

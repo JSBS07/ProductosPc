@@ -32,6 +32,10 @@ public class Usuario {
     @Column(columnDefinition = "TEXT")
     private String carritoJson;
 
+    // Indicador si la contraseña fue restablecida por el admin (mostrar mensaje al ingresar)
+    @Column(nullable = false)
+    private Boolean passwordRestablecida = false;
+
     // Constructores
     public Usuario() {}
 
@@ -89,5 +93,13 @@ public class Usuario {
 
     public void setCarritoJson(String carritoJson) {
         this.carritoJson = carritoJson;
+    }
+
+    public Boolean getPasswordRestablecida() {
+        return passwordRestablecida;
+    }
+
+    public void setPasswordRestablecida(Boolean passwordRestablecida) {
+        this.passwordRestablecida = passwordRestablecida;
     }
 }
