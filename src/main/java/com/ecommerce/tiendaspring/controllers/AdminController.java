@@ -31,30 +31,45 @@ public class AdminController {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
+    // VISTA PRINCIPAL 
     @GetMapping({"","/","/dashboard"})
     public String dashboard(Model model) {
         List<Producto> productos = productoService.obtenerTodosLosProductos();
+        
+        //Cálculos para las tarjetas del dashboard
+        long totalProductos = productos.size();
+        long stockBajo = productos.stream()
+            .filter(p -> {
+                int stockReal = p.getStock() - p.getStockReservado();
+                return stockReal > 2 && stockReal <= 5;
+            })
+            .count();
+        long stockCritico = productos.stream()
+            .filter(p -> {
+                int stockReal = p.getStock() - p.getStockReservado();
+                return stockReal <= 2;
+            })
+            .count();
+        int totalReservado = productos.stream()
+            .mapToInt(Producto::getStockReservado)
+            .sum();
+        int inventarioTotal = productos.stream()
+            .mapToInt(Producto::getStock)
+            .sum();
+        int disponibleReal = inventarioTotal - totalReservado;
+        
         model.addAttribute("productos", productos);
-        return "admin-dashboard";
-    }
-
-    @GetMapping("/productos")
-    public String listarProductos(Model model) {
-        model.addAttribute("productos", productoService.obtenerTodosLosProductos());
+        model.addAttribute("totalProductos", totalProductos);
+        model.addAttribute("stockBajo", stockBajo);
+        model.addAttribute("stockCritico", stockCritico);
+        model.addAttribute("totalReservado", totalReservado);
+        model.addAttribute("inventarioTotal", inventarioTotal);
+        model.addAttribute("disponibleReal", disponibleReal);
+        
         return "admin-productos";
     }
 
-    @GetMapping("/productos/reponer/{id}")
-    public String formReponer(@PathVariable Long id, Model model) {
-        Producto p = productoService.obtenerProductoPorId(id).orElse(null);
-        if (p == null) {
-            model.addAttribute("error", "Producto no encontrado");
-            return "redirect:/admin/productos";
-        }
-        model.addAttribute("producto", p);
-        return "admin-reponer-stock";
-    }
-
+    // Reposición rápida desde la tabla
     @PostMapping("/productos/reponer/{id}")
     public String reponerStock(@PathVariable Long id,
                                @RequestParam(name = "cantidad") Integer cantidad,
@@ -63,22 +78,25 @@ public class AdminController {
         try {
             if (cantidad == null || cantidad <= 0) {
                 redirectAttributes.addFlashAttribute("error", "Cantidad inválida");
-                return "redirect:/admin/productos";
+                return "redirect:/admin"; 
             }
-            // Llamamos al servicio que ya limita la cantidad a 30
+            
+            //  limita la cantidad a 30
             productoService.reponerStock(id, cantidad);
+            
             if (cantidad > 30) {
                 redirectAttributes.addFlashAttribute("success", "Cantidad limitada a 30. Stock repuesto correctamente.");
             } else {
-                redirectAttributes.addFlashAttribute("success", "Stock repuesto correctamente");
+                redirectAttributes.addFlashAttribute("success", "Stock repuesto correctamente: +" + cantidad + " unidades");
             }
-            return "redirect:/admin/productos";
+            return "redirect:/admin"; 
         } catch (Exception e) {
             redirectAttributes.addFlashAttribute("error", "Error al reponer stock: " + e.getMessage());
-            return "redirect:/admin/productos";
+            return "redirect:/admin"; 
         }
     }
 
+    //  Gestión de usuarios
     @GetMapping("/usuarios")
     public String listarUsuarios(Model model) {
         model.addAttribute("usuarios", usuarioRepository.findAll());
@@ -88,8 +106,7 @@ public class AdminController {
     @PostMapping("/usuarios/reset/{id}")
     public String resetearContrasena(@PathVariable Long id, RedirectAttributes redirectAttributes) {
         try {
-            // Fijar contraseña temporal 123456 como pediste
-            // obtener email del usuario para el mensaje
+            // Fijar contraseña temporal 123456 
             String email = usuarioRepository.findById(id).map(u -> u.getEmail()).orElse("(desconocido)");
             usuarioService.resetPasswordByAdmin(id, "123456", passwordEncoder);
             redirectAttributes.addFlashAttribute("success", "Has cambiado la contraseña para " + email + ". La nueva es 123456");
