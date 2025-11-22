@@ -1,17 +1,29 @@
-# Imagen con JDK
-FROM eclipse-temurin:24-jdk-alpine
+# Build stage: usar imagen oficial de Maven con JDK para compilar
+FROM maven:3.9.4-eclipse-temurin-24 AS build
 
-# Crear carpeta en el contenedor
 WORKDIR /app
 
-# Copiar archivo pom.xml y fuente
-COPY . .
+# Copiar sólo lo necesario primero para aprovechar cache (pom y wrapper)
+COPY pom.xml mvnw ./
+COPY .mvn .mvn
 
-# Empaquetar el proyecto
-RUN ./mvnw -B package
+# Copiar el resto del proyecto
+COPY src ./src
 
-# Exponer el puerto
+# Construir el proyecto sin tests
+RUN mvn -B -DskipTests package
+
+
+# Runtime stage: imagen ligera con JRE
+FROM eclipse-temurin:24-jre-jammy
+
+WORKDIR /app
+
+# JAR generado desde el stage de build
+COPY --from=build /app/target/*.jar app.jar
+
+# Puerto expuesto por la app Spring Boot
 EXPOSE 8080
 
-# Ejecutar el .jar
-CMD ["java", "-jar", "target/*.jar"]
+# Ejecutar la aplicación
+ENTRYPOINT ["java", "-jar", "/app/app.jar"]
