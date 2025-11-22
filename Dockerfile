@@ -8,12 +8,14 @@ COPY pom.xml .
 COPY mvnw .
 COPY .mvn .mvn
 
+
+RUN chmod +x ./mvnw
+
 # Copiar el resto del proyecto
 COPY src ./src
 
 # Compilar el proyecto
 RUN ./mvnw -B -DskipTests package
-
 
 # Runtime stage usando JRE estable
 FROM eclipse-temurin:21-jre
